@@ -6,12 +6,8 @@ $orderPlaced = false;
 $invoice = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_SESSION["user"])) {
-        // Optionally, you can show a message or allow guest checkout
-        $user_email = "Guest";
-    } else {
-        $user_email = $_SESSION["user"];
-    }
+    $customer_name = $_POST['customer_name'];
+    $customer_email = $_POST['customer_email'];
     $payment = $_POST['payment'];
     $total = 0;
     $products = [];
@@ -27,12 +23,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'qty' => $qty,
                 'subtotal' => $subtotal
             ];
-            // Save order to DB if you want
-            $conn->query("INSERT INTO orders (user_email, product_id, quantity, total_price, payment_method) VALUES ('$user_email', $id, $qty, $subtotal, '$payment')");
+            // Save order to DB
+            $conn->query("INSERT INTO orders (customer_name, customer_email, product_id, quantity, total_price, payment_method) VALUES ('$customer_name', '$customer_email', $id, $qty, $subtotal, '$payment')");
         }
     }
     $invoice = [
-        'user_email' => $user_email,
+        'customer_name' => $customer_name,
+        'customer_email' => $customer_email,
         'payment' => $payment,
         'products' => $products,
         'total' => $total
@@ -225,7 +222,8 @@ body, .auth-page {
     <div class="invoice-container">
         <div class="invoice-header"><i class="fas fa-receipt"></i> Invoice</div>
         <div class="invoice-info">
-            <strong>Email:</strong> <?php echo htmlspecialchars($invoice['user_email']); ?><br>
+            <strong>Name:</strong> <?php echo htmlspecialchars($invoice['customer_name']); ?><br>
+            <strong>Email:</strong> <?php echo htmlspecialchars($invoice['customer_email']); ?><br>
             <strong>Payment Method:</strong> <?php echo htmlspecialchars($invoice['payment']); ?>
         </div>
         <table class="invoice-table">
@@ -253,21 +251,33 @@ body, .auth-page {
         <div class="auth-card">
             <div class="auth-header">
                 <i class="fas fa-credit-card"></i>
-                <h2>Checkout</h2>
-                <p>Enter your payment details to complete your order</p>
+<h2>Checkout</h2>
+                <p>Enter your details and payment method to complete your order</p>
             </div>
             <form method="post" class="auth-form">
                 <div class="form-group">
                     <label>
+                        <i class="fas fa-user"></i> Name
+                    </label>
+                    <input type="text" name="customer_name" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" name="customer_email" required>
+                </div>
+                <div class="form-group">
+                    <label>
                         <i class="fas fa-money-bill-wave"></i> Select Payment Method
                     </label>
-                    <input type="radio" name="payment" value="COD" required> Cash on Delivery<br>
+  <input type="radio" name="payment" value="COD" required> Cash on Delivery<br>
                     <input type="radio" name="payment" value="Online"> Online Payment
                 </div>
                 <button type="submit" class="auth-btn">
                     <i class="fas fa-check"></i> Place Order
                 </button>
-            </form>
+</form>
             <div class="auth-footer">
                 <a href="cart.php" class="back-home">
                     <i class="fas fa-arrow-left"></i> Back to Cart
@@ -277,5 +287,4 @@ body, .auth-page {
     </div>
 </div>
 <?php endif; ?>
-
 <?php include 'footer.php'; ?>

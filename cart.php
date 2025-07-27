@@ -132,8 +132,8 @@ table.cart-table {
         </tr>
         <?php
         foreach ($_SESSION["cart"] as $id => $qty) {
-            $res = $conn->query("SELECT * FROM products WHERE id=$id");
-            if ($row = $res->fetch_assoc()) {
+    $res = $conn->query("SELECT * FROM products WHERE id=$id");
+    if ($row = $res->fetch_assoc()) {
                 $subtotal = $row['price'] * $qty;
                 $total += $subtotal;
                 echo "<tr>";
