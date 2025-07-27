@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
         
         <p style="text-align: center; margin-top: 20px;">
-            <a href="index.html">Back to Home</a>
+            <a href="index.php">Back to Home</a>
         </p>
     </div>
 </body>

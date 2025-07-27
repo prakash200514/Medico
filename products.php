@@ -10,6 +10,8 @@ if ($category) {
     $sql .= " WHERE category='$category'";
 }
 $res = $conn->query($sql);
+// Get cart for badge counts
+$cart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 ?>
 
 <div class="products-page">
@@ -40,7 +42,10 @@ $res = $conn->query($sql);
     </div>
 
     <div class="products-grid">
-        <?php while($row = $res->fetch_assoc()): ?>
+        <?php while($row = $res->fetch_assoc()): 
+            $productId = $row['id'];
+            $productCount = isset($cart[$productId]) ? $cart[$productId] : 0;
+        ?>
             <div class="product-card">
                 <div class="product-image">
                     <img src="img/<?php echo $row['image']; ?>" alt="<?php echo $row['name']; ?>">
@@ -50,9 +55,12 @@ $res = $conn->query($sql);
                     <p class="product-category"><?php echo $row['category']; ?></p>
                     <p class="product-price">₹<?php echo $row['price']; ?></p>
                     <p class="product-stock">Stock: <?php echo $row['stock']; ?> units</p>
-                    <a href="cart.php?add=<?php echo $row['id']; ?>" class="add-to-cart-btn">
+                    <button class="add-to-cart-btn" onclick="addToCart(<?php echo $productId; ?>, this)" data-product-id="<?php echo $productId; ?>">
                         <i class="fas fa-shopping-cart"></i> Add to Cart
-                    </a>
+                        <span class="product-cart-badge" id="product-badge-<?php echo $productId; ?>" style="<?php echo $productCount > 0 ? '' : 'display:none;'; ?>">
+                            <?php echo $productCount; ?>
+                        </span>
+                    </button>
                 </div>
             </div>
         <?php endwhile; ?>
@@ -236,6 +244,7 @@ $res = $conn->query($sql);
     border-radius: 8px;
     font-weight: 600;
     transition: background 0.3s ease;
+    position: relative; /* Added for badge positioning */
 }
 
 .add-to-cart-btn:hover {
@@ -310,6 +319,20 @@ $res = $conn->query($sql);
     background: #5a6fd8;
 }
 
+.product-cart-badge {
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 8px;
+    display: inline-block;
+    min-width: 22px;
+    text-align: center;
+    vertical-align: middle;
+}
+
 @media (max-width: 768px) {
     .filters-section {
         flex-direction: column;
@@ -329,5 +352,71 @@ $res = $conn->query($sql);
     }
 }
 </style>
+
+<script>
+function addToCart(productId, btn) {
+    btn.disabled = true;
+    var original = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+    fetch('add_to_cart_ajax.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'product_id=' + productId
+    })
+    .then(response => response.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = original;
+        if (data.success) {
+            showNotification(data.message, 'success');
+            updateCartCount(data.cart_count);
+            updateProductBadge(productId);
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = original;
+        showNotification('Error adding to cart.', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    let existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    let n = document.createElement('div');
+    n.className = 'notification notification-' + type;
+    n.innerHTML = message;
+    n.style.cssText = 'position:fixed;top:20px;right:20px;background:' + (type==='success'?'#28a745':'#dc3545') + ';color:#fff;padding:15px 20px;border-radius:8px;z-index:1000;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-width:300px;';
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 2500);
+}
+
+function updateCartCount(count) {
+    const cartLink = document.querySelector('a[href="cart.php"]');
+    let badge = cartLink.querySelector('.cart-badge');
+    if (count > 0) {
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'cart-badge';
+            cartLink.appendChild(badge);
+        }
+        badge.textContent = count;
+    } else {
+        if (badge) badge.remove();
+    }
+}
+
+function updateProductBadge(productId) {
+    // Find the badge for this product
+    var badge = document.getElementById('product-badge-' + productId);
+    if (badge) {
+        let current = parseInt(badge.textContent) || 0;
+        badge.textContent = current + 1;
+        badge.style.display = '';
+    }
+}
+</script>
 
 <?php include 'footer.php'; ?>

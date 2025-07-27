@@ -26,13 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $response = array(
             'success' => true,
-            'message' => 'Product added to cart successfully!',
+            'message' => 'Product added to cart!',
             'cart_count' => $total_items
         );
     } else {
         $response = array(
             'success' => false,
-            'message' => 'Product ID is required'
+            'message' => 'Product ID is required.'
         );
     }
     

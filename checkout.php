@@ -248,7 +248,34 @@ body, .auth-page {
         <a href="products.php" class="invoice-btn"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
     </div>
 <?php else: ?>
-    <!-- Your checkout form here (as before) -->
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-credit-card"></i>
+                <h2>Checkout</h2>
+                <p>Enter your payment details to complete your order</p>
+            </div>
+            <form method="post" class="auth-form">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-money-bill-wave"></i> Select Payment Method
+                    </label>
+                    <input type="radio" name="payment" value="COD" required> Cash on Delivery<br>
+                    <input type="radio" name="payment" value="Online"> Online Payment
+                </div>
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-check"></i> Place Order
+                </button>
+            </form>
+            <div class="auth-footer">
+                <a href="cart.php" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 <?php endif; ?>
 
 <?php include 'footer.php'; ?>
