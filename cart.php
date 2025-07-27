@@ -4,10 +4,21 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include 'db.php';
 $page_title = "Cart - Medico";
-include 'header.php';
 
 // Initialize cart as associative array: id => qty
 if (!isset($_SESSION["cart"])) $_SESSION["cart"] = [];
+
+// Add to cart from ?add=ID
+if (isset($_GET["add"])) {
+    $id = (int)$_GET["add"];
+    if (isset($_SESSION["cart"][$id])) {
+        $_SESSION["cart"][$id]++;
+    } else {
+        $_SESSION["cart"][$id] = 1;
+    }
+    header("Location: cart.php");
+    exit;
+}
 
 // Remove from cart
 if (isset($_GET["remove"])) {
@@ -28,6 +39,7 @@ if (isset($_POST['update_qty'])) {
     exit;
 }
 
+include 'header.php';
 $total = 0;
 ?>
 <style>

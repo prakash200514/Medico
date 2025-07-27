@@ -34,6 +34,7 @@ $res = $conn->query($sql);
                 <option value="Syrups" <?php echo $category == 'Syrups' ? 'selected' : ''; ?>>Syrups</option>
                 <option value="Supplements" <?php echo $category == 'Supplements' ? 'selected' : ''; ?>>Supplements</option>
                 <option value="Creams" <?php echo $category == 'Creams' ? 'selected' : ''; ?>>Creams</option>
+                <option value="Equipments" <?php echo $category == 'Equipments' ? 'selected' : ''; ?>>Equipments</option>
             </select>
         </form>
     </div>

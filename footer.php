@@ -6,7 +6,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3><i class="fas fa-pills"></i> Medico</h3>
-                    <p>Your trusted online pharmacy for quality medicines and healthcare products. We provide safe, reliable, and affordable healthcare solutions.</p>
+                    <p>Your trusted  our online pharmacy for quality medicines and healthcare products. We provide safe, reliable, and affordable healthcare solutions.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -32,15 +32,16 @@
                         <li><a href="products.php?category=Syrups">Syrups</a></li>
                         <li><a href="products.php?category=Supplements">Supplements</a></li>
                         <li><a href="products.php?category=Creams">Creams</a></li>
+                        <li><a href="products.php?category=Equipments">Equipments</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
                     <h4>Contact Info</h4>
                     <div class="contact-info">
-                        <p><i class="fas fa-phone"></i> +91 98765 43210</p>
-                        <p><i class="fas fa-envelope"></i> info@medico.com</p>
-                        <p><i class="fas fa-map-marker-alt"></i> 123 Medical Street, Health City, HC 12345</p>
+                        <p><i class="fas fa-phone"></i> +91 82703 65246</p>
+                        <p><i class="fas fa-envelope"></i> marimuthuprakash2005@gmail.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i>127/a,Shanthi Nagar,palsyamkottai-627002</p>
                     </div>
                 </div>
             </div>
