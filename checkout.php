@@ -17,6 +17,8 @@ if ($step === 'submit' && $_SERVER["REQUEST_METHOD"] == "POST" && !$cartIsEmpty)
     $payment = $_POST['payment'];
     $total = 0;
     $products = [];
+    $order_date = date('Y-m-d');
+    $delivery_date = date('Y-m-d', strtotime($order_date . ' +6 days'));
 
     foreach ($_SESSION['cart'] as $id => $qty) {
         $res = $conn->query("SELECT * FROM products WHERE id=$id");
@@ -30,7 +32,7 @@ if ($step === 'submit' && $_SERVER["REQUEST_METHOD"] == "POST" && !$cartIsEmpty)
                 'subtotal' => $subtotal
             ];
             // Save order to DB
-            $conn->query("INSERT INTO orders (customer_name, customer_email, product_id, quantity, total_price, payment_method, address, phone) VALUES ('$customer_name', '$customer_email', $id, $qty, $subtotal, '$payment', '$customer_address', '$customer_phone')");
+            $conn->query("INSERT INTO orders (customer_name, customer_email, product_id, quantity, total_price, payment_method, address, phone, order_date, delivery_date) VALUES ('$customer_name', '$customer_email', $id, $qty, $subtotal, '$payment', '$customer_address', '$customer_phone', '$order_date', '$delivery_date')");
         }
     }
     $invoice = [
@@ -40,7 +42,9 @@ if ($step === 'submit' && $_SERVER["REQUEST_METHOD"] == "POST" && !$cartIsEmpty)
         'customer_phone' => $customer_phone,
         'payment' => $payment,
         'products' => $products,
-        'total' => $total
+        'total' => $total,
+        'order_date' => $order_date,
+        'delivery_date' => $delivery_date
     ];
     $_SESSION["cart"] = [];
     $orderPlaced = true;
@@ -260,13 +264,17 @@ body, .auth-page {
         <div style="color: #28a745; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
             ✅ Order Placed Successfully!
         </div>
-        <div class="invoice-header"><i class="fas fa-receipt"></i> Invoice</div>
+        <div class="invoice-header" style="margin-bottom:0.5rem;"><i class="fas fa-receipt"></i> Invoice</div>
+        <div style="font-size:1.3rem; font-weight:700; color:#1e90ff; margin-bottom:0.5rem;">Medico</div>
         <div class="invoice-info">
             <strong>Name:</strong> <?php echo htmlspecialchars($invoice['customer_name']); ?><br>
             <strong>Email:</strong> <?php echo htmlspecialchars($invoice['customer_email']); ?><br>
             <strong>Address:</strong> <?php echo htmlspecialchars($invoice['customer_address']); ?><br>
             <strong>Phone:</strong> <?php echo htmlspecialchars($invoice['customer_phone']); ?><br>
-            <strong>Payment Method:</strong> <?php echo htmlspecialchars($invoice['payment']); ?>
+            <strong>Payment Method:</strong> <?php echo htmlspecialchars($invoice['payment']); ?><br>
+            <strong>Order Date:</strong> <?php echo date('d M Y', strtotime($invoice['order_date'])); ?><br>
+            <strong>Home Delivery Date:</strong> <?php echo date('d M Y', strtotime($invoice['delivery_date'])); ?> <br>
+            <span style="color:#28a745; font-weight:600;">Coming to your home safely</span>
         </div>
         <table class="invoice-table">
             <tr>
