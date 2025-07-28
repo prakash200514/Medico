@@ -217,9 +217,34 @@ body, .auth-page {
     background: #5a6fd8;
 }
 </style>
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .invoice-container, .invoice-container * {
+        visibility: visible;
+    }
+    .invoice-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+    }
+    .invoice-btn, .invoice-btn * {
+        display: none !important;
+    }
+}
+</style>
 
 <?php if ($orderPlaced): ?>
     <div class="invoice-container">
+        <div style="color: #28a745; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
+            ✅ Order Placed Successfully!
+        </div>
         <div class="invoice-header"><i class="fas fa-receipt"></i> Invoice</div>
         <div class="invoice-info">
             <strong>Name:</strong> <?php echo htmlspecialchars($invoice['customer_name']); ?><br>
@@ -244,6 +269,9 @@ body, .auth-page {
         </table>
         <div class="invoice-total">Total: ₹<?php echo number_format($invoice['total'], 2); ?></div>
         <a href="products.php" class="invoice-btn"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+        <a href="#" class="invoice-btn" onclick="window.print(); return false;">
+            <i class="fas fa-download"></i> Download/Print Invoice
+        </a>
     </div>
 <?php else: ?>
 <div class="auth-page">
@@ -251,9 +279,39 @@ body, .auth-page {
         <div class="auth-card">
             <div class="auth-header">
                 <i class="fas fa-credit-card"></i>
-<h2>Checkout</h2>
+                <h2>Checkout</h2>
                 <p>Enter your details and payment method to complete your order</p>
             </div>
+            <?php
+            // Show cart summary before the form
+            if (!empty($_SESSION['cart'])):
+                $cart_total = 0;
+            ?>
+                <h3 style="margin-bottom:1rem;">Your Cart</h3>
+                <table class="invoice-table">
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Subtotal</th>
+                    </tr>
+                    <?php
+                    foreach ($_SESSION['cart'] as $id => $qty):
+                        $res = $conn->query("SELECT * FROM products WHERE id=$id");
+                        if ($row = $res->fetch_assoc()):
+                            $subtotal = $row['price'] * $qty;
+                            $cart_total += $subtotal;
+                    ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td>₹<?php echo number_format($row['price'], 2); ?></td>
+                        <td><?php echo $qty; ?></td>
+                        <td>₹<?php echo number_format($subtotal, 2); ?></td>
+                    </tr>
+                    <?php endif; endforeach; ?>
+                </table>
+                <div class="invoice-total" style="margin-bottom:2rem;">Total: ₹<?php echo number_format($cart_total, 2); ?></div>
+            <?php endif; ?>
             <form method="post" class="auth-form">
                 <div class="form-group">
                     <label>
