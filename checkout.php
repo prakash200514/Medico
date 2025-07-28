@@ -2,12 +2,18 @@
 session_start();
 include 'db.php';
 
+$cartIsEmpty = empty($_SESSION['cart']) || count($_SESSION['cart']) === 0;
+
 $orderPlaced = false;
 $invoice = [];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$step = isset($_GET['step']) ? $_GET['step'] : 'cart';
+
+if ($step === 'submit' && $_SERVER["REQUEST_METHOD"] == "POST" && !$cartIsEmpty) {
     $customer_name = $_POST['customer_name'];
     $customer_email = $_POST['customer_email'];
+    $customer_address = $_POST['customer_address'];
+    $customer_phone = $_POST['customer_phone'];
     $payment = $_POST['payment'];
     $total = 0;
     $products = [];
@@ -24,12 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'subtotal' => $subtotal
             ];
             // Save order to DB
-            $conn->query("INSERT INTO orders (customer_name, customer_email, product_id, quantity, total_price, payment_method) VALUES ('$customer_name', '$customer_email', $id, $qty, $subtotal, '$payment')");
+            $conn->query("INSERT INTO orders (customer_name, customer_email, product_id, quantity, total_price, payment_method, address, phone) VALUES ('$customer_name', '$customer_email', $id, $qty, $subtotal, '$payment', '$customer_address', '$customer_phone')");
         }
     }
     $invoice = [
         'customer_name' => $customer_name,
         'customer_email' => $customer_email,
+        'customer_address' => $customer_address,
+        'customer_phone' => $customer_phone,
         'payment' => $payment,
         'products' => $products,
         'total' => $total
@@ -240,7 +248,14 @@ body, .auth-page {
 }
 </style>
 
-<?php if ($orderPlaced): ?>
+<?php if ($cartIsEmpty): ?>
+    <div class="invoice-container">
+        <div style="color: #dc3545; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
+            Your cart is empty. Please add products before checking out.
+        </div>
+        <a href="products.php" class="invoice-btn"><i class="fas fa-arrow-left"></i> Go to Products</a>
+    </div>
+<?php elseif ($orderPlaced): ?>
     <div class="invoice-container">
         <div style="color: #28a745; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
             ✅ Order Placed Successfully!
@@ -249,6 +264,8 @@ body, .auth-page {
         <div class="invoice-info">
             <strong>Name:</strong> <?php echo htmlspecialchars($invoice['customer_name']); ?><br>
             <strong>Email:</strong> <?php echo htmlspecialchars($invoice['customer_email']); ?><br>
+            <strong>Address:</strong> <?php echo htmlspecialchars($invoice['customer_address']); ?><br>
+            <strong>Phone:</strong> <?php echo htmlspecialchars($invoice['customer_phone']); ?><br>
             <strong>Payment Method:</strong> <?php echo htmlspecialchars($invoice['payment']); ?>
         </div>
         <table class="invoice-table">
@@ -273,7 +290,7 @@ body, .auth-page {
             <i class="fas fa-download"></i> Download/Print Invoice
         </a>
     </div>
-<?php else: ?>
+<?php elseif ($step === 'form'): ?>
 <div class="auth-page">
     <div class="auth-container">
         <div class="auth-card">
@@ -281,6 +298,59 @@ body, .auth-page {
                 <i class="fas fa-credit-card"></i>
                 <h2>Checkout</h2>
                 <p>Enter your details and payment method to complete your order</p>
+            </div>
+            <form method="post" action="checkout.php?step=submit" class="auth-form">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user"></i> Name
+                    </label>
+                    <input type="text" name="customer_name" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" name="customer_email" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-map-marker-alt"></i> Address
+                    </label>
+                    <input type="text" name="customer_address" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-phone"></i> Phone
+                    </label>
+                    <input type="text" name="customer_phone" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-money-bill-wave"></i> Select Payment Method
+                    </label>
+                    <input type="radio" name="payment" value="COD" required> Cash on Delivery<br>
+                    <input type="radio" name="payment" value="Online"> Online Payment
+                </div>
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-check"></i> Place Order
+                </button>
+            </form>
+            <div class="auth-footer">
+                <a href="cart.php" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php else: ?>
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-credit-card"></i>
+                <h2>Checkout</h2>
+                <p>Review your cart and proceed to place your order</p>
             </div>
             <?php
             // Show cart summary before the form
@@ -311,31 +381,10 @@ body, .auth-page {
                     <?php endif; endforeach; ?>
                 </table>
                 <div class="invoice-total" style="margin-bottom:2rem;">Total: ₹<?php echo number_format($cart_total, 2); ?></div>
+                <a href="checkout.php?step=form" class="auth-btn" style="margin-top:1.5rem;">
+                    <i class="fas fa-arrow-right"></i> Place Order
+                </a>
             <?php endif; ?>
-            <form method="post" class="auth-form">
-                <div class="form-group">
-                    <label>
-                        <i class="fas fa-user"></i> Name
-                    </label>
-                    <input type="text" name="customer_name" required>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <i class="fas fa-envelope"></i> Email
-                    </label>
-                    <input type="email" name="customer_email" required>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <i class="fas fa-money-bill-wave"></i> Select Payment Method
-                    </label>
-  <input type="radio" name="payment" value="COD" required> Cash on Delivery<br>
-                    <input type="radio" name="payment" value="Online"> Online Payment
-                </div>
-                <button type="submit" class="auth-btn">
-                    <i class="fas fa-check"></i> Place Order
-                </button>
-</form>
             <div class="auth-footer">
                 <a href="cart.php" class="back-home">
                     <i class="fas fa-arrow-left"></i> Back to Cart
