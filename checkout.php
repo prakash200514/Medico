@@ -323,6 +323,121 @@ body, .auth-page {
         <a href="products.php" class="invoice-btn"><i class="fas fa-arrow-left"></i> Go to Products</a>
     </div>
 <?php elseif ($orderPlaced): ?>
+    <!-- Order Success Sound -->
+    <audio id="orderSuccessSound" preload="auto">
+        <source src="https://www.soundjay.com/misc/sounds/fail-buzzer-02.wav" type="audio/wav">
+        <source src="https://www.soundjay.com/misc/sounds/fail-buzzer-02.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="successChime" preload="auto">
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Celebration Confetti Container -->
+    <div id="confetti-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden;"></div>
+    <script>
+        // Play powerful success sound when order is placed
+        window.addEventListener('load', function() {
+            // Create a more powerful audio experience
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Function to create a powerful success sound
+            function playPowerfulSuccessSound() {
+                try {
+                    // Create multiple oscillators for a rich sound
+                    const oscillator1 = audioContext.createOscillator();
+                    const oscillator2 = audioContext.createOscillator();
+                    const oscillator3 = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    // Connect all oscillators to gain node
+                    oscillator1.connect(gainNode);
+                    oscillator2.connect(gainNode);
+                    oscillator3.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Set different frequencies for a chord-like effect
+                    oscillator1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                    oscillator2.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+                    oscillator3.frequency.setValueAtTime(783.99, audioContext.currentTime); // G5
+                    
+                    // Set oscillator types
+                    oscillator1.type = 'sine';
+                    oscillator2.type = 'triangle';
+                    oscillator3.type = 'sine';
+                    
+                    // Create a dramatic volume envelope
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
+                    
+                    // Start all oscillators
+                    oscillator1.start(audioContext.currentTime);
+                    oscillator2.start(audioContext.currentTime);
+                    oscillator3.start(audioContext.currentTime);
+                    
+                    // Stop oscillators
+                    oscillator1.stop(audioContext.currentTime + 1.5);
+                    oscillator2.stop(audioContext.currentTime + 1.5);
+                    oscillator3.stop(audioContext.currentTime + 1.5);
+                    
+                    // Add a second chord after a short delay
+                    setTimeout(function() {
+                        const osc4 = audioContext.createOscillator();
+                        const osc5 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        
+                        osc4.connect(gain2);
+                        osc5.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        
+                        osc4.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+                        osc5.frequency.setValueAtTime(783.99, audioContext.currentTime); // G5
+                        
+                        osc4.type = 'sine';
+                        osc5.type = 'triangle';
+                        
+                        gain2.gain.setValueAtTime(0, audioContext.currentTime);
+                        gain2.gain.linearRampToValueAtTime(0.6, audioContext.currentTime + 0.1);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
+                        
+                        osc4.start(audioContext.currentTime);
+                        osc5.start(audioContext.currentTime);
+                        
+                        osc4.stop(audioContext.currentTime + 1.0);
+                        osc5.stop(audioContext.currentTime + 1.0);
+                    }, 200);
+                    
+                    console.log('Powerful order success sound played!');
+                    
+                } catch (error) {
+                    console.log('Powerful sound generation failed:', error);
+                    // Fallback to simple audio
+                    playFallbackSound();
+                }
+            }
+            
+            // Fallback function for simple audio
+            function playFallbackSound() {
+                const audio = document.getElementById('orderSuccessSound');
+                if (audio) {
+                    audio.volume = 0.7;
+                    const playPromise = audio.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(function() {
+                            console.log('Fallback order success sound played');
+                        }).catch(function(error) {
+                            console.log('All audio methods failed:', error);
+                        });
+                    }
+                }
+            }
+            
+            // Try to play the powerful sound
+            playPowerfulSuccessSound();
+        });
+    </script>
     <div class="invoice-container">
         <div style="color: #28a745; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
             ✅ Order Placed Successfully!
