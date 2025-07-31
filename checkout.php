@@ -176,41 +176,94 @@ body, .auth-page {
     margin: 50px auto;
     background: #fff;
     border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    padding: 2.5rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    padding: 2.5rem 2rem;
     text-align: center;
     font-family: 'Poppins', sans-serif;
+    position: relative;
 }
+
 .invoice-header {
     color: #1e90ff;
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
+
+.invoice-container .shop-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #4e54c8;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+}
+
+.invoice-info {
+    margin-bottom: 1.5rem;
+    color: #444;
+    font-size: 1rem;
+    text-align: left;
+    background: #f7f9fb;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(30,144,255,0.04);
+}
+
+.invoice-info strong {
+    color: #222;
+    font-weight: 600;
+}
+
+.invoice-info span {
+    display: block;
+    margin-top: 0.5rem;
+    color: #28a745;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
 .invoice-table {
     width: 100%;
     margin: 1.5rem 0;
     border-collapse: collapse;
-}
-.invoice-table th, .invoice-table td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    text-align: center;
-}
-.invoice-table th {
     background: #f7f9fb;
-    color: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(30,144,255,0.04);
 }
+
+.invoice-table th, .invoice-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #eaeaea;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.invoice-table th {
+    background: #e3eafc;
+    color: #333;
+    font-weight: 700;
+    border-bottom: 2px solid #c3dafe;
+}
+
+.invoice-table tr:last-child td {
+    border-bottom: none;
+}
+
 .invoice-total {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: bold;
     color: #28a745;
     margin-top: 1rem;
-}
-.invoice-info {
     margin-bottom: 1.5rem;
-    color: #555;
+    letter-spacing: 1px;
 }
+
 .invoice-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
@@ -220,16 +273,26 @@ body, .auth-page {
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 2rem;
+    margin-top: 1.2rem;
     text-decoration: none;
     display: inline-block;
-    transition: background 0.3s;
+    transition: background 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.08);
 }
+
 .invoice-btn:hover {
     background: #5a6fd8;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.18);
 }
-</style>
-<style>
+
+@media (max-width: 600px) {
+    .invoice-container {
+        padding: 1.2rem 0.5rem;
+    }
+    .invoice-info {
+        padding: 0.7rem 0.5rem;
+    }
+}
 @media print {
     body * {
         visibility: hidden;
@@ -265,7 +328,7 @@ body, .auth-page {
             ✅ Order Placed Successfully!
         </div>
         <div class="invoice-header" style="margin-bottom:0.5rem;"><i class="fas fa-receipt"></i> Invoice</div>
-        <div style="font-size:1.3rem; font-weight:700; color:#1e90ff; margin-bottom:0.5rem;">Medico</div>
+        <div class="shop-name">Medico</div>
         <div class="invoice-info">
             <strong>Name:</strong> <?php echo htmlspecialchars($invoice['customer_name']); ?><br>
             <strong>Email:</strong> <?php echo htmlspecialchars($invoice['customer_email']); ?><br>
@@ -274,7 +337,7 @@ body, .auth-page {
             <strong>Payment Method:</strong> <?php echo htmlspecialchars($invoice['payment']); ?><br>
             <strong>Order Date:</strong> <?php echo date('d M Y', strtotime($invoice['order_date'])); ?><br>
             <strong>Home Delivery Date:</strong> <?php echo date('d M Y', strtotime($invoice['delivery_date'])); ?> <br>
-            <span style="color:#28a745; font-weight:600;">Coming to your home safely</span>
+            <span>Coming to your home safely</span>
         </div>
         <table class="invoice-table">
             <tr>
