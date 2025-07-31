@@ -336,7 +336,7 @@ body, .auth-page {
     <!-- Celebration Confetti Container -->
     <div id="confetti-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden;"></div>
     <script>
-        // Play powerful success sound when order is placed
+        // Play powerful success sound and celebration effects when order is placed
         window.addEventListener('load', function() {
             // Create a more powerful audio experience
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -433,6 +433,96 @@ body, .auth-page {
                     }
                 }
             }
+            
+            // Confetti celebration effect
+            function createConfetti() {
+                const confettiContainer = document.getElementById('confetti-container');
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+                const emojis = ['🎉', '🎊', '✨', '💫', '🌟', '🎈', '🎁', '🏆'];
+                
+                // Create multiple confetti pieces
+                for (let i = 0; i < 150; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.style.position = 'absolute';
+                        confetti.style.left = Math.random() * 100 + '%';
+                        confetti.style.top = '-20px';
+                        confetti.style.width = Math.random() * 10 + 5 + 'px';
+                        confetti.style.height = Math.random() * 10 + 5 + 'px';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                        confetti.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+                        confetti.style.animation = 'confetti-fall 3s linear forwards';
+                        confetti.style.zIndex = '10000';
+                        
+                        // Add some emoji confetti
+                        if (Math.random() > 0.7) {
+                            confetti.style.fontSize = '20px';
+                            confetti.style.backgroundColor = 'transparent';
+                            confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        }
+                        
+                        confettiContainer.appendChild(confetti);
+                        
+                        // Remove confetti after animation
+                        setTimeout(() => {
+                            if (confetti.parentNode) {
+                                confetti.parentNode.removeChild(confetti);
+                            }
+                        }, 3000);
+                    }, i * 20);
+                }
+            }
+            
+            // Add confetti animation CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes confetti-fall {
+                    0% {
+                        transform: translateY(-20px) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+                
+                @keyframes celebration-bounce {
+                    0%, 20%, 50%, 80%, 100% {
+                        transform: translateY(0);
+                    }
+                    40% {
+                        transform: translateY(-30px);
+                    }
+                    60% {
+                        transform: translateY(-15px);
+                    }
+                }
+                
+                .celebration-text {
+                    animation: celebration-bounce 2s ease-in-out;
+                    color: #28a745;
+                    font-weight: bold;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add celebration text effect
+            function addCelebrationText() {
+                const successText = document.querySelector('.invoice-container div[style*="color: #28a745"]');
+                if (successText) {
+                    successText.classList.add('celebration-text');
+                    successText.innerHTML = '🎉 Order Placed Successfully! 🎉';
+                }
+            }
+            
+            // Start celebration effects
+            setTimeout(() => {
+                createConfetti();
+                addCelebrationText();
+            }, 500);
             
             // Try to play the powerful sound
             playPowerfulSuccessSound();
